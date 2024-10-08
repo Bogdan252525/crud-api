@@ -10,6 +10,7 @@
 		"strict": true,
 		"target":"ES2018",
 		"lib": ["ES6"],
+		"removeComments": true,
 		"sourceMap": true,
 		"allowJs": true,
 		"rootDir": "./src",
@@ -17,8 +18,5 @@
 	},
 	"include": ["src/**/*"],
 	"exclude": ["node_modules"],
-	"lib": ["esnext"],
-	"ts-node": {
-		"esm": true
-	}
+	"lib": ["esnext"]
 }

@@ -6,9 +6,10 @@
   "type": "module",
   "scripts": {
     "start:dev": "npx nodemon",
-    "start:multi": "ts-node src/clusterMod.ts",
-    "build": "tsc",
-    "start:prod": "node dist/clusterMod.js"
+    "start:multi": "tsx ./src/cluster.ts",
+    "build": "npx tsc",
+    "prod:start": "node dist/index.js",
+		"prod:multi": "node dist/cluster.js"
   },
   "keywords": [],
   "author": "Bohdan Rud",
@@ -21,7 +22,7 @@
     "@types/node": "^22.7.4",
     "@types/uuid": "^10.0.0",
     "nodemon": "^3.1.7",
-		"tsx": "^4.19.1",
+    "tsx": "^4.19.1",
     "typescript": "^5.6.2"
   }
 }
