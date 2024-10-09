@@ -1,23 +1,44 @@
-import clusterMod from 'cluster';
+import cluster from 'node:cluster';
 import { cpus } from 'os';
-import startServer from './server.js';
+import startServer from './server';
+import { loadBalancer } from './loadBalancer';
 
 const numCPUs = cpus().length;
+const ports = Array.from({ length: numCPUs - 1 }, (_, i) => 4001 + i);
+const workers = new Map<number, number>();
 
-if (clusterMod.isPrimary) {
+if (cluster.isPrimary) {
   console.log(`Primary ${process.pid} is running`);
 
-  for (let i = 0; i < numCPUs; i++) {
-    const port = 4000 + i;
-    clusterMod.fork({ PORT: port.toString() });
-  }
+  loadBalancer();
 
-  clusterMod.on('exit', (worker, code, signal) => {
-    console.log(`Worker ${worker.process?.pid} died, starting a new one`);
-    const port = 4000 + Math.floor(Math.random() * numCPUs);
-    clusterMod.fork({ PORT: port.toString() });
+  ports.forEach((port) => {
+    const worker = cluster.fork({ PORT: port.toString() });
+
+    if (worker.process?.pid !== undefined) {
+      workers.set(worker.process.pid, port);
+    } else {
+      console.error('Worker PID is undefined');
+    }
+  });
+
+  cluster.on('exit', (worker) => {
+    const pid = worker.process?.pid;
+    if (pid !== undefined) {
+      const port = workers.get(pid);
+      console.log(`Worker ${pid} died, starting a new one`);
+
+      if (port !== undefined) {
+        const newWorker = cluster.fork({ PORT: port.toString() });
+        workers.set(newWorker.process?.pid!, port);
+      } else {
+        console.error(`Port not found for worker ${pid}`);
+      }
+    } else {
+      console.error('Worker process PID is undefined, cannot restart worker');
+    }
   });
 } else {
-  const port = process.env.PORT || 4000;
+  const port = process.env.PORT || 4001;
   startServer(port);
 }
