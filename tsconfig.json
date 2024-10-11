@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "esModuleInterop": true,
@@ -11,8 +11,8 @@
     "strict": true,
     "target": "ES2018",
     "lib": ["ES6"],
+		"sourceMap": false,
     "removeComments": true,
-    "sourceMap": true,
     "allowJs": true,
     "rootDir": "./src",
     "outDir": "./dist",
